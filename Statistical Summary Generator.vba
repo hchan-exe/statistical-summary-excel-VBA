@@ -4,7 +4,6 @@ Application.DisplayAlerts = False
 Application.ScreenUpdating = False
 Application.Calculation = xlCalculationAutomatic
 
-
 Dim Fund_Name, File_Name, Strategy_Name As String
 
 Data_Source = "Path"
@@ -129,7 +128,6 @@ Data_Source = "Path"
     End If
     Next
      
-
 'Copy Stats tab
     ThisWorkbook.Activate
     Sheets("Stats").Range("A1:Q37").SpecialCells(xlCellTypeVisible).Copy
