@@ -1,0 +1,149 @@
+Sub Stat_Summary_Generator()
+
+Application.DisplayAlerts = False
+Application.ScreenUpdating = False
+Application.Calculation = xlCalculationAutomatic
+
+
+Dim Fund_Name, File_Name, Strategy_Name As String
+
+Data_Source = "Path"
+
+'Rolling 12M
+    ThisWorkbook.Sheets("Peers").Range("C3").Select
+    Application.CutCopyMode = False
+'Rolling from:
+    ActiveCell.FormulaR1C1 = Range("H4").Value
+'Choose Fund ticker
+    Range("J5").Select
+    ActiveCell.FormulaR1C1 = Range("J5").Value
+'File and Fund name
+    Fund_Name = Replace(Range("C13").Value, "/", "")
+    AsOfDate = Range("H8").Value
+    Strategy_Name = Replace(Range("AZ4").Value, "/", "")
+    File_Name = Fund_Name & "_Stats_" & AsOfDate & " " & Strategy_Name
+    
+'Create a new workbook for storing the data
+    Dim wk As Workbook
+    Set wk = Workbooks.Add
+
+'Save the file to following path
+    wk.SaveAs "P:Hedge Fund Statistical Summary\" & File_Name & ".xlsx"
+    wk.Activate
+    ActiveSheet.Name = "1Y"
+    Sheets.Add(After:=Sheets(1)).Name = "2Y"
+    Sheets.Add(After:=Sheets(2)).Name = "3Y"
+    Sheets.Add(After:=Sheets(3)).Name = "ITD"
+    Sheets.Add(After:=Sheets(4)).Name = "Stats"
+    
+'Copy Rolling 12M
+    Dim wb As Workbook
+    Set wb = ThisWorkbook
+    ThisWorkbook.Sheets("Peers").Range("B12:AT32").SpecialCells(xlCellTypeVisible).Copy
+    Application.Wait (Now + TimeValue("00:00:01"))
+    ActiveWorkbook.Worksheets("1Y").Range("A1").PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+    ActiveWorkbook.Worksheets("1Y").Range("A1").PasteSpecial Paste:=xlPasteFormats, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+    Worksheets("1Y").Cells.EntireColumn.AutoFit
+    Worksheets("1Y").Cells.EntireRow.AutoFit
+'delete blank
+    Worksheets("1Y").Select
+    For i = 1 To 20
+    If Cells(i, 2).Value = 0 Then
+    'Range(Cells(i, 1), Cells(22, 50)).Select
+    Range(Cells(i, 1), Cells(22, 50)).Delete
+    'Range(Cells(1, i + 1), Cells(1, 22)).EntireColumn.Select
+    Range(Cells(1, i + 1), Cells(1, 22)).EntireColumn.Delete
+    Exit For
+    End If
+    Next
+    For j = 1 To 40
+    If Cells(1, j).Value = "Total Rtn" Then
+    'Range(Cells(1, j - 1), Cells(1, j + 8)).AutoFilter
+    Range(Cells(1, j - 1), Cells(i - 1, j + 8)).Select
+    Selection.Sort Key1:=Worksheets("1Y").Cells(2, j), Order1:=xlDescending, Header:=xlYes
+    Exit For
+    End If
+    Next
+
+'Repeat above by rolling 24M
+    ThisWorkbook.Activate
+    Sheets("Peers").Range("C3").Select
+    Application.CutCopyMode = False
+    ActiveCell.FormulaR1C1 = Range("H5").Value
+     
+'Repeat above by rolling 36M
+    ThisWorkbook.Activate
+    Sheets("Peers").Range("C3").Select
+    Application.CutCopyMode = False
+    ActiveCell.FormulaR1C1 = Range("H6").Value
+
+'delete blank
+    Worksheets("3Y").Select
+    For i = 1 To 20
+    If Cells(i, 2).Value = 0 Then
+    Range(Cells(i, 1), Cells(22, 50)).Delete
+    Range(Cells(1, i + 1), Cells(1, 22)).EntireColumn.Delete
+    Exit For
+    End If
+    Next
+    For j = 1 To 40
+    If Cells(1, j).Value = "Total Rtn" Then
+    'Range(Cells(1, j - 1), Cells(1, j + 8)).AutoFilter
+    Range(Cells(1, j - 1), Cells(i - 1, j + 8)).Select
+    Selection.Sort Key1:=Worksheets("3Y").Cells(2, j), Order1:=xlDescending, Header:=xlYes
+    Exit For
+    End If
+    Next
+
+'Repeat above by rolling Since Inception
+    ThisWorkbook.Activate
+    Sheets("Peers").Range("C3").Select
+    Application.CutCopyMode = False
+    ActiveCell.FormulaR1C1 = Range("H7").Value
+    ThisWorkbook.Sheets("Peers").Range("B12:AT32").SpecialCells(xlCellTypeVisible).Copy
+    Application.Wait (Now + TimeValue("00:00:01"))
+    wk.Activate
+    wk.Worksheets("ITD").Range("A1").PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+    wk.Worksheets("ITD").Range("A1").PasteSpecial Paste:=xlPasteFormats, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+    wk.Worksheets("ITD").Cells.EntireColumn.AutoFit
+    wk.Worksheets("ITD").Cells.EntireRow.AutoFit
+'delete blank
+    Worksheets("ITD").Select
+    For i = 1 To 20
+    If Cells(i, 2).Value = 0 Then
+    Range(Cells(i, 1), Cells(22, 50)).Delete
+    Range(Cells(1, i + 1), Cells(1, 22)).EntireColumn.Delete
+    Exit For
+    End If
+    Next
+    For j = 1 To 40
+    If Cells(1, j).Value = "Total Rtn" Then
+    'Range(Cells(1, j - 1), Cells(1, j + 8)).AutoFilter
+    Range(Cells(1, j - 1), Cells(i - 1, j + 8)).Select
+    Selection.Sort Key1:=Worksheets("ITD").Cells(2, j), Order1:=xlDescending, Header:=xlYes
+    Exit For
+    End If
+    Next
+     
+
+'Copy Stats tab
+    ThisWorkbook.Activate
+    Sheets("Stats").Range("A1:Q37").SpecialCells(xlCellTypeVisible).Copy
+    Application.Wait (Now + TimeValue("00:00:01"))
+    wk.Activate
+    wk.Worksheets("Stats").Range("A1").PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+    wk.Worksheets("Stats").Range("A1").PasteSpecial Paste:=xlPasteFormats, Operation:=xlNone, _
+        SkipBlanks:=False, Transpose:=False
+    wk.Worksheets("Stats").Cells.EntireColumn.AutoFit
+    wk.Worksheets("Stats").Cells.EntireRow.AutoFit
+    wk.Sheets("Stats").Activate
+    Range("A1").Select
+
+MsgBox "Done! File Is Saved to \Path\"
+
+End Sub
