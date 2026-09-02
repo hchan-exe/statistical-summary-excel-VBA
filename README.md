@@ -1,2 +1,2 @@
-# VBA Codes for Automation
-Automate repetitive statistical analysis across multiple rolling time horizon in Excel
+# Excel VBA Codes for Generating Statistical Summary Analysis File
+It is used for automating repetitive statistical analysis across multiple rolling time horizon.
